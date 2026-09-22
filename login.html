@@ -42,13 +42,44 @@
     </div>
 
     <!-- Alert / Fallback Callout Box -->
+    <div id="unauthorizedDomainCard" style="display: none; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.45); border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem;">
+      <div style="display: flex; gap: 0.65rem; align-items: flex-start;">
+        <span style="font-size: 1.3rem; line-height: 1;">🌐</span>
+        <div style="flex: 1;">
+          <h3 style="color: #fbbf24; font-size: 0.92rem; font-weight: 700; margin: 0 0 0.35rem 0;">Vercel Domain Not Authorized Yet</h3>
+          <p style="color: #cbd5e1; font-size: 0.8rem; line-height: 1.5; margin: 0 0 0.65rem 0;">
+            Firebase Auth blocks sign-ins on new domains to protect your project. You need to allowlist your Vercel URL once in the Firebase Console:
+          </p>
+          
+          <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 6px; padding: 0.45rem 0.65rem; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+            <code id="currentDomainDisplay" style="color: #38bdf8; font-size: 0.8rem; word-break: break-all; font-family: monospace;"></code>
+            <button type="button" id="copyDomainBtn" class="btn btn-outline-cyan btn-sm" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; white-space: nowrap;">
+              Copy Domain
+            </button>
+          </div>
+
+          <div style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 0.75rem; line-height: 1.5;">
+            <strong style="color: #f1f5f9;">How to fix in 30 seconds:</strong><br/>
+            1. Click the button below to open Firebase Settings<br/>
+            2. Scroll to <strong>Authorized domains</strong> &gt; click <strong>Add domain</strong><br/>
+            3. Paste your domain (or simply <code>vercel.app</code>) and click <strong>Save</strong>
+          </div>
+
+          <a href="https://console.firebase.google.com/project/ai-studio-ce927e57-99b1-44a8-a8f0-e3614fbf7fde/authentication/settings" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; width: 100%; text-decoration: none; font-size: 0.84rem; padding: 0.6rem;">
+            <span>Open Firebase Console Settings ↗</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert / Fallback Callout Box -->
     <div id="authAlertBox" style="display: none; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 8px; padding: 0.85rem; margin-bottom: 1.25rem;">
       <div style="display: flex; gap: 0.5rem; align-items: flex-start;">
         <span style="font-size: 1.1rem; line-height: 1;">⚠️</span>
         <div style="flex: 1;">
           <div id="authStatusMsg" style="font-size: 0.82rem; color: #fca5a5; line-height: 1.5; margin-bottom: 0.5rem;"></div>
           <button type="button" id="alertGoogleRetryBtn" class="btn btn-outline-cyan btn-sm" style="width: 100%; font-size: 0.8rem; padding: 0.35rem 0.75rem;">
-            Use Google Sign-In Instead →
+            Retry Google Sign-In →
           </button>
         </div>
       </div>
@@ -107,10 +138,57 @@
     const tabRegister = document.getElementById('tabRegister');
     const submitBtn = document.getElementById('submitAuthBtn');
     const authAlertBox = document.getElementById('authAlertBox');
+    const unauthorizedDomainCard = document.getElementById('unauthorizedDomainCard');
+    const currentDomainDisplay = document.getElementById('currentDomainDisplay');
+    const copyDomainBtn = document.getElementById('copyDomainBtn');
     const statusMsg = document.getElementById('authStatusMsg');
     const authForm = document.getElementById('authForm');
     const googleBtn = document.getElementById('googleSignInBtn');
     const alertGoogleRetryBtn = document.getElementById('alertGoogleRetryBtn');
+
+    // Clipboard copy for domain
+    if (copyDomainBtn) {
+      copyDomainBtn.addEventListener('click', async () => {
+        const domain = window.location.hostname || 'vercel.app';
+        try {
+          await navigator.clipboard.writeText(domain);
+          copyDomainBtn.textContent = 'Copied!';
+          setTimeout(() => {
+            copyDomainBtn.textContent = 'Copy Domain';
+          }, 2000);
+        } catch (err) {
+          // Fallback
+          const ta = document.createElement('textarea');
+          ta.value = domain;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          copyDomainBtn.textContent = 'Copied!';
+          setTimeout(() => {
+            copyDomainBtn.textContent = 'Copy Domain';
+          }, 2000);
+        }
+      });
+    }
+
+    function showError(result) {
+      const isUnauthorizedDomain =
+        result.rawError?.code === 'auth/unauthorized-domain' ||
+        (result.error && result.error.toLowerCase().includes('unauthorized domain'));
+
+      if (isUnauthorizedDomain) {
+        if (currentDomainDisplay) {
+          currentDomainDisplay.textContent = window.location.hostname || 'your-domain.vercel.app';
+        }
+        if (unauthorizedDomainCard) unauthorizedDomainCard.style.display = 'block';
+        if (authAlertBox) authAlertBox.style.display = 'none';
+      } else {
+        if (unauthorizedDomainCard) unauthorizedDomainCard.style.display = 'none';
+        if (statusMsg) statusMsg.textContent = result.error || 'Authentication failed. Please try again.';
+        if (authAlertBox) authAlertBox.style.display = 'block';
+      }
+    }
 
     // If already authenticated, redirect straight to admin panel
     onAuthChange((user) => {
@@ -126,7 +204,8 @@
       tabRegister.style.background = 'transparent';
       tabRegister.style.color = '#94a3b8';
       submitBtn.textContent = 'Sign In with Email';
-      authAlertBox.style.display = 'none';
+      if (authAlertBox) authAlertBox.style.display = 'none';
+      if (unauthorizedDomainCard) unauthorizedDomainCard.style.display = 'none';
     });
 
     tabRegister.addEventListener('click', () => {
@@ -136,11 +215,13 @@
       tabSignIn.style.background = 'transparent';
       tabSignIn.style.color = '#94a3b8';
       submitBtn.textContent = 'Create Admin Account';
-      authAlertBox.style.display = 'none';
+      if (authAlertBox) authAlertBox.style.display = 'none';
+      if (unauthorizedDomainCard) unauthorizedDomainCard.style.display = 'none';
     });
 
     async function handleGoogleLogin() {
-      authAlertBox.style.display = 'none';
+      if (authAlertBox) authAlertBox.style.display = 'none';
+      if (unauthorizedDomainCard) unauthorizedDomainCard.style.display = 'none';
       googleBtn.disabled = true;
       googleBtn.innerHTML = '<span>Signing in with Google...</span>';
       
@@ -158,20 +239,20 @@
           </svg>
           <span>Sign in with Google</span>
         `;
-        statusMsg.textContent = result.error || 'Google Sign-in failed. Please check pop-up permissions.';
-        authAlertBox.style.display = 'block';
+        showError(result);
       }
     }
 
     googleBtn.addEventListener('click', handleGoogleLogin);
-    alertGoogleRetryBtn.addEventListener('click', handleGoogleLogin);
+    if (alertGoogleRetryBtn) alertGoogleRetryBtn.addEventListener('click', handleGoogleLogin);
 
     authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('authEmail').value.trim();
       const password = document.getElementById('authPassword').value;
 
-      authAlertBox.style.display = 'none';
+      if (authAlertBox) authAlertBox.style.display = 'none';
+      if (unauthorizedDomainCard) unauthorizedDomainCard.style.display = 'none';
       submitBtn.disabled = true;
       submitBtn.textContent = 'Authenticating...';
 
@@ -187,8 +268,7 @@
       } else {
         submitBtn.disabled = false;
         submitBtn.textContent = isRegisterMode ? 'Create Admin Account' : 'Sign In with Email';
-        statusMsg.textContent = result.error;
-        authAlertBox.style.display = 'block';
+        showError(result);
       }
     });
   </script>

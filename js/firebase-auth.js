@@ -13,6 +13,10 @@ const googleProvider = new GoogleAuthProvider();
 function formatAuthError(error) {
   if (!error) return 'An unknown authentication error occurred.';
   const code = error.code || '';
+  if (code === 'auth/unauthorized-domain') {
+    const host = typeof window !== 'undefined' ? window.location.hostname : 'your Vercel domain';
+    return `Unauthorized Domain: "${host}" is not in your Firebase Authorized Domains list. Please add "${host}" (or "vercel.app") in Firebase Console > Authentication > Settings > Authorized domains.`;
+  }
   if (code === 'auth/operation-not-allowed') {
     return 'Email/Password sign-in is not enabled in your Firebase Console. Please click "Sign in with Google" (which is enabled by default) or enable Email/Password under Firebase Console > Authentication > Sign-in method.';
   }
