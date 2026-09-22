@@ -18,6 +18,22 @@ export default defineConfig(() => {
           admin: path.resolve(__dirname, 'admin.html'),
           login: path.resolve(__dirname, 'login.html'),
         },
+        output: {
+          manualChunks(id) {
+            if (id.includes('firebase/auth') || id.includes('@firebase/auth')) {
+              return 'firebase-auth';
+            }
+            if (id.includes('firebase/storage') || id.includes('@firebase/storage')) {
+              return 'firebase-storage';
+            }
+            if (id.includes('firebase/firestore') || id.includes('@firebase/firestore')) {
+              return 'firebase-firestore';
+            }
+            if (id.includes('node_modules/firebase') || id.includes('@firebase/')) {
+              return 'firebase-core';
+            }
+          },
+        },
       },
     },
     server: {

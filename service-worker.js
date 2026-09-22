@@ -9,12 +9,10 @@ const STATIC_ASSETS = [
   '/admin.html',
   '/login.html',
   '/manifest.json',
-  '/public/icon.svg',
   '/icon.svg',
   '/pwa-192x192.png',
   '/pwa-512x512.png',
-  '/css/style.css',
-  '/css/admin.css'
+  '/apple-touch-icon.png'
 ];
 
 // Cache size limiter to prevent storage bloat
@@ -61,32 +59,32 @@ async function handleStaleWhileRevalidate(request, cacheName) {
   // Background fetch to revalidate and update cache
   const fetchPromise = fetch(request)
     .then(async (networkResponse) => {
-      // Valid responses include 200 OK or opaque responses (status 0) from CORS image requests
       if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
         try {
           await cache.put(request, networkResponse.clone());
           limitCacheSize(cacheName, MAX_IMAGE_CACHE_ENTRIES);
         } catch (cacheErr) {
-          console.warn('[SW] Could not put image in cache:', cacheErr);
+          // Ignore cache write issues
         }
       }
       return networkResponse;
     })
-    .catch((err) => {
-      // Network failed or offline, return cached response if available
-      return cachedResponse;
-    });
+    .catch(() => cachedResponse);
 
-  // Return cached response immediately for instant previews, falling back to network fetch
   return cachedResponse || fetchPromise;
 }
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS).catch((err) => {
-        console.warn('Failed to precache some static assets:', err);
-      });
+    caches.open(CACHE_NAME).then(async (cache) => {
+      // Use Promise.allSettled so individual missing assets don't fail SW installation
+      await Promise.allSettled(
+        STATIC_ASSETS.map((asset) =>
+          cache.add(asset).catch((err) => {
+            console.info('[SW] Pre-cache skipped:', asset, err?.message);
+          })
+        )
+      );
     })
   );
   self.skipWaiting();

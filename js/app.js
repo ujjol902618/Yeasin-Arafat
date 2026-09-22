@@ -24,13 +24,74 @@ let activeProjectCategory = 'all';
 // PWA Install Prompt State
 let deferredPWAInstallPrompt = null;
 
+const CACHE_KEY = 'ya_portfolio_cache_v2';
+
+function getCachedData() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function updateCache(key, data) {
+  try {
+    const current = getCachedData() || {};
+    current[key] = data;
+    localStorage.setItem(CACHE_KEY, JSON.stringify(current));
+  } catch (e) {
+    // Ignore quota issues
+  }
+}
+
+// Render Instant Initial UI (0ms First Paint from localStorage or seed data)
+function renderInstantInitialUI() {
+  const cached = getCachedData();
+  renderProfile(cached?.profile || DEFAULT_PROFILE);
+  renderAbout(cached?.about || DEFAULT_ABOUT);
+  renderStatistics(cached?.statistics || DEFAULT_STATISTICS);
+
+  const skills = (cached?.skills || DEFAULT_SKILLS).filter((s) => s.enabled !== false);
+  renderSkills(skills);
+  setupSkillsFilter(skills);
+
+  const services = (cached?.services || DEFAULT_SERVICES).filter((s) => s.enabled !== false);
+  renderServices(services);
+
+  currentProjects = (cached?.projects || DEFAULT_PROJECTS).filter((p) => p.published !== false);
+  renderProjects(currentProjects);
+  setupProjectsFilter();
+
+  renderExperience(cached?.experiences || DEFAULT_EXPERIENCES);
+  renderEducation(cached?.education || DEFAULT_EDUCATION);
+  renderCertifications(cached?.certifications || DEFAULT_CERTIFICATIONS);
+
+  const testimonials = (cached?.testimonials || DEFAULT_TESTIMONIALS).filter((t) => t.enabled !== false);
+  renderTestimonials(testimonials);
+
+  const clients = (cached?.clients || DEFAULT_CLIENTS).filter((c) => c.enabled !== false);
+  renderClients(clients);
+
+  const socialLinks = (cached?.socialLinks || DEFAULT_SOCIAL_LINKS).filter((s) => s.enabled !== false);
+  renderSocialLinks(socialLinks);
+
+  renderSettings(cached?.settings || DEFAULT_SETTINGS);
+}
+
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
+  // 1. Instant 0ms Paint
+  renderInstantInitialUI();
+
+  // 2. Setup interactive components & PWA
   initServiceWorker();
   initPWAInstall();
   initMobileNav();
   initSmoothScroll();
   initContactForm();
+
+  // 3. Background Firestore synchronization (Stale-While-Revalidate)
   loadAllPortfolioData();
 });
 
@@ -135,10 +196,10 @@ function initSmoothScroll() {
   });
 }
 
-// Load dynamic data from Firestore (falling back gracefully to seed data)
+// Load dynamic data from Firestore in background (Stale-While-Revalidate)
 async function loadAllPortfolioData() {
   try {
-    await Promise.all([
+    await Promise.allSettled([
       loadProfile(),
       loadAbout(),
       loadStatistics(),
@@ -154,26 +215,18 @@ async function loadAllPortfolioData() {
       loadSettings(),
     ]);
   } catch (err) {
-    console.error('Error loading portfolio data:', err);
+    console.warn('Background sync notice:', err);
   }
 }
 
 // 1. Profile / Hero Section
-async function loadProfile() {
-  let profile = DEFAULT_PROFILE;
-  try {
-    const snap = await getDoc(doc(db, 'profile', 'general'));
-    if (snap.exists()) {
-      profile = { ...DEFAULT_PROFILE, ...snap.data() };
-    }
-  } catch (e) {
-    console.warn('Using default profile data:', e);
-  }
-
-  // Bind to DOM
-  setText('heroName', profile.name);
-  setText('heroTitle', profile.title);
-  setText('heroDesc', profile.shortBio);
+function renderProfile(profile) {
+  if (!profile) return;
+  setText('brandLogoLink', profile.name || 'Yeasin Arafat');
+  setText('siteBrandName', profile.name || 'Yeasin Arafat');
+  setText('heroName', profile.name || 'Yeasin Arafat');
+  setText('heroTitle', profile.title || 'Web Developer & Web Designer');
+  setText('heroDesc', profile.shortBio || '');
   setText('heroAvailability', profile.availability || 'Available for Freelance & Full-time Roles');
   
   const imgEl = document.getElementById('heroAvatar');
@@ -187,23 +240,27 @@ async function loadProfile() {
   setText('contactLocationVal', profile.location);
 }
 
-// 2. About Section
-async function loadAbout() {
-  let about = DEFAULT_ABOUT;
+async function loadProfile() {
   try {
-    const snap = await getDoc(doc(db, 'about', 'general'));
+    const snap = await getDoc(doc(db, 'profile', 'general'));
     if (snap.exists()) {
-      about = { ...DEFAULT_ABOUT, ...snap.data() };
+      const fresh = { ...DEFAULT_PROFILE, ...snap.data() };
+      renderProfile(fresh);
+      updateCache('profile', fresh);
     }
   } catch (e) {
-    console.warn('Using default about data:', e);
+    // Retain cached or seed view
   }
+}
 
+// 2. About Section
+function renderAbout(about) {
+  if (!about) return;
   const contentEl = document.getElementById('aboutContentText');
   if (contentEl) {
-    contentEl.textContent = about.content;
+    contentEl.textContent = about.content || '';
   }
-  setText('aboutSubheading', about.subheading);
+  setText('aboutSubheading', about.subheading || '');
 
   const cvBtn = document.getElementById('aboutCvBtn');
   if (cvBtn && about.cvUrl) {
@@ -211,24 +268,25 @@ async function loadAbout() {
   }
 }
 
-// 3. Statistics Section
-async function loadStatistics() {
-  let stats = DEFAULT_STATISTICS;
+async function loadAbout() {
   try {
-    const q = query(collection(db, 'statistics'), orderBy('order', 'asc'));
-    const snap = await getDocs(q);
-    if (!snap.empty) {
-      stats = [];
-      snap.forEach((d) => stats.push({ id: d.id, ...d.data() }));
+    const snap = await getDoc(doc(db, 'about', 'general'));
+    if (snap.exists()) {
+      const fresh = { ...DEFAULT_ABOUT, ...snap.data() };
+      renderAbout(fresh);
+      updateCache('about', fresh);
     }
   } catch (e) {
-    console.warn('Using default stats:', e);
+    // Retain cached view
   }
+}
 
+// 3. Statistics Section
+function renderStatistics(statsList) {
   const container = document.getElementById('statisticsGrid');
-  if (!container) return;
+  if (!container || !statsList) return;
 
-  container.innerHTML = stats
+  container.innerHTML = statsList
     .map(
       (s) => `
     <div class="glass-card stat-card" id="${s.id}">
@@ -240,28 +298,42 @@ async function loadStatistics() {
     .join('');
 }
 
+async function loadStatistics() {
+  try {
+    const q = query(collection(db, 'statistics'), orderBy('order', 'asc'));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const stats = [];
+      snap.forEach((d) => stats.push({ id: d.id, ...d.data() }));
+      renderStatistics(stats);
+      updateCache('statistics', stats);
+    }
+  } catch (e) {
+    // Retain cached view
+  }
+}
+
 // 4. Skills Section
 async function loadSkills() {
-  let skills = DEFAULT_SKILLS;
   try {
     const q = query(collection(db, 'skills'), orderBy('order', 'asc'));
     const snap = await getDocs(q);
     if (!snap.empty) {
-      skills = [];
+      const skills = [];
       snap.forEach((d) => skills.push({ id: d.id, ...d.data() }));
+      const enabled = skills.filter((s) => s.enabled !== false);
+      renderSkills(enabled);
+      setupSkillsFilter(enabled);
+      updateCache('skills', skills);
     }
   } catch (e) {
-    console.warn('Using default skills:', e);
+    // Retain cached view
   }
-
-  const enabledSkills = skills.filter((s) => s.enabled !== false);
-  renderSkills(enabledSkills);
-  setupSkillsFilter(enabledSkills);
 }
 
 function renderSkills(skillsList) {
   const container = document.getElementById('skillsGrid');
-  if (!container) return;
+  if (!container || !skillsList) return;
 
   container.innerHTML = skillsList
     .map(
@@ -283,7 +355,7 @@ function renderSkills(skillsList) {
 function setupSkillsFilter(allSkills) {
   const filterBtns = document.querySelectorAll('.skills-tab-btn');
   filterBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.onclick = () => {
       filterBtns.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       const cat = btn.getAttribute('data-cat');
@@ -293,33 +365,20 @@ function setupSkillsFilter(allSkills) {
         const filtered = allSkills.filter((s) => (s.category || '').toLowerCase() === cat.toLowerCase());
         renderSkills(filtered);
       }
-    });
+    };
   });
 }
 
 // 5. Services Section
-async function loadServices() {
-  let services = DEFAULT_SERVICES;
-  try {
-    const q = query(collection(db, 'services'), orderBy('order', 'asc'));
-    const snap = await getDocs(q);
-    if (!snap.empty) {
-      services = [];
-      snap.forEach((d) => services.push({ id: d.id, ...d.data() }));
-    }
-  } catch (e) {
-    console.warn('Using default services:', e);
-  }
-
-  const enabled = services.filter((s) => s.enabled !== false);
+function renderServices(servicesList) {
   const container = document.getElementById('servicesGrid');
-  if (!container) return;
+  if (!container || !servicesList) return;
 
-  const getIconSvg = (name) => {
+  const getIconSvg = () => {
     return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg>`;
   };
 
-  container.innerHTML = enabled
+  container.innerHTML = servicesList
     .map(
       (serv) => `
     <div class="glass-card service-card" id="${serv.id}">
@@ -334,28 +393,43 @@ async function loadServices() {
     .join('');
 }
 
+async function loadServices() {
+  try {
+    const q = query(collection(db, 'services'), orderBy('order', 'asc'));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const services = [];
+      snap.forEach((d) => services.push({ id: d.id, ...d.data() }));
+      const enabled = services.filter((s) => s.enabled !== false);
+      renderServices(enabled);
+      updateCache('services', services);
+    }
+  } catch (e) {
+    // Retain cached view
+  }
+}
+
 // 6. Projects Section
 async function loadProjects() {
-  let projects = DEFAULT_PROJECTS;
   try {
     const q = query(collection(db, 'projects'), orderBy('order', 'asc'));
     const snap = await getDocs(q);
     if (!snap.empty) {
-      projects = [];
+      const projects = [];
       snap.forEach((d) => projects.push({ id: d.id, ...d.data() }));
+      currentProjects = projects.filter((p) => p.published !== false);
+      renderProjects(currentProjects);
+      setupProjectsFilter();
+      updateCache('projects', projects);
     }
   } catch (e) {
-    console.warn('Using default projects:', e);
+    // Retain cached view
   }
-
-  currentProjects = projects.filter((p) => p.published !== false);
-  renderProjects(currentProjects);
-  setupProjectsFilter();
 }
 
 function renderProjects(projectsList) {
   const container = document.getElementById('projectsGrid');
-  if (!container) return;
+  if (!container || !projectsList) return;
 
   if (projectsList.length === 0) {
     container.innerHTML = `
@@ -399,18 +473,18 @@ function renderProjects(projectsList) {
   // Attach gallery modal handlers
   const galleryBtns = container.querySelectorAll('.view-gallery-btn');
   galleryBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.onclick = () => {
       const pId = btn.getAttribute('data-project-id');
       const proj = currentProjects.find((x) => x.id === pId);
       if (proj) openProjectModal(proj);
-    });
+    };
   });
 }
 
 function setupProjectsFilter() {
   const filterBtns = document.querySelectorAll('.project-filter-btn');
   filterBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.onclick = () => {
       filterBtns.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       const cat = btn.getAttribute('data-filter');
@@ -423,7 +497,7 @@ function setupProjectsFilter() {
         );
         renderProjects(filtered);
       }
-    });
+    };
   });
 }
 
@@ -475,21 +549,9 @@ window.closeProjectModal = function () {
 };
 
 // 7. Experience Section
-async function loadExperience() {
-  let list = DEFAULT_EXPERIENCES;
-  try {
-    const q = query(collection(db, 'experiences'), orderBy('order', 'asc'));
-    const snap = await getDocs(q);
-    if (!snap.empty) {
-      list = [];
-      snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
-    }
-  } catch (e) {
-    console.warn('Using default experiences:', e);
-  }
-
+function renderExperience(list) {
   const container = document.getElementById('experienceTimeline');
-  if (!container) return;
+  if (!container || !list) return;
 
   container.innerHTML = list
     .map(
@@ -506,22 +568,25 @@ async function loadExperience() {
     .join('');
 }
 
-// 8. Education Section
-async function loadEducation() {
-  let list = DEFAULT_EDUCATION;
+async function loadExperience() {
   try {
-    const q = query(collection(db, 'education'), orderBy('order', 'asc'));
+    const q = query(collection(db, 'experiences'), orderBy('order', 'asc'));
     const snap = await getDocs(q);
     if (!snap.empty) {
-      list = [];
+      const list = [];
       snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
+      renderExperience(list);
+      updateCache('experiences', list);
     }
   } catch (e) {
-    console.warn('Using default education:', e);
+    // Retain cached view
   }
+}
 
+// 8. Education Section
+function renderEducation(list) {
   const container = document.getElementById('educationTimeline');
-  if (!container) return;
+  if (!container || !list) return;
 
   container.innerHTML = list
     .map(
@@ -538,22 +603,25 @@ async function loadEducation() {
     .join('');
 }
 
-// 9. Certifications Section
-async function loadCertifications() {
-  let list = DEFAULT_CERTIFICATIONS;
+async function loadEducation() {
   try {
-    const q = query(collection(db, 'certifications'), orderBy('order', 'asc'));
+    const q = query(collection(db, 'education'), orderBy('order', 'asc'));
     const snap = await getDocs(q);
     if (!snap.empty) {
-      list = [];
+      const list = [];
       snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
+      renderEducation(list);
+      updateCache('education', list);
     }
   } catch (e) {
-    console.warn('Using default certs:', e);
+    // Retain cached view
   }
+}
 
+// 9. Certifications Section
+function renderCertifications(list) {
   const container = document.getElementById('certificationsGrid');
-  if (!container) return;
+  if (!container || !list) return;
 
   container.innerHTML = list
     .map(
@@ -572,25 +640,27 @@ async function loadCertifications() {
     .join('');
 }
 
-// 10. Testimonials Section
-async function loadTestimonials() {
-  let list = DEFAULT_TESTIMONIALS;
+async function loadCertifications() {
   try {
-    const q = query(collection(db, 'testimonials'), orderBy('order', 'asc'));
+    const q = query(collection(db, 'certifications'), orderBy('order', 'asc'));
     const snap = await getDocs(q);
     if (!snap.empty) {
-      list = [];
+      const list = [];
       snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
+      renderCertifications(list);
+      updateCache('certifications', list);
     }
   } catch (e) {
-    console.warn('Using default testimonials:', e);
+    // Retain cached view
   }
+}
 
-  const enabled = list.filter((t) => t.enabled !== false);
+// 10. Testimonials Section
+function renderTestimonials(list) {
   const container = document.getElementById('testimonialsGrid');
-  if (!container) return;
+  if (!container || !list) return;
 
-  container.innerHTML = enabled
+  container.innerHTML = list
     .map(
       (t) => `
     <div class="glass-card testimonial-card" id="${t.id}">
@@ -609,25 +679,28 @@ async function loadTestimonials() {
     .join('');
 }
 
-// 11. Clients Section (Trusted By)
-async function loadClients() {
-  let list = DEFAULT_CLIENTS;
+async function loadTestimonials() {
   try {
-    const q = query(collection(db, 'clients'), orderBy('order', 'asc'));
+    const q = query(collection(db, 'testimonials'), orderBy('order', 'asc'));
     const snap = await getDocs(q);
     if (!snap.empty) {
-      list = [];
+      const list = [];
       snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
+      const enabled = list.filter((t) => t.enabled !== false);
+      renderTestimonials(enabled);
+      updateCache('testimonials', list);
     }
   } catch (e) {
-    console.warn('Using default clients:', e);
+    // Retain cached view
   }
+}
 
-  const enabled = list.filter((c) => c.enabled !== false);
+// 11. Clients Section (Trusted By)
+function renderClients(list) {
   const container = document.getElementById('clientsGrid');
-  if (!container) return;
+  if (!container || !list) return;
 
-  container.innerHTML = enabled
+  container.innerHTML = list
     .map(
       (client) => `
     <div class="client-badge" id="${client.id}">
@@ -638,25 +711,29 @@ async function loadClients() {
     .join('');
 }
 
-// 12. Social Links
-async function loadSocialLinks() {
-  let list = DEFAULT_SOCIAL_LINKS;
+async function loadClients() {
   try {
-    const q = query(collection(db, 'socialLinks'), orderBy('order', 'asc'));
+    const q = query(collection(db, 'clients'), orderBy('order', 'asc'));
     const snap = await getDocs(q);
     if (!snap.empty) {
-      list = [];
+      const list = [];
       snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
+      const enabled = list.filter((c) => c.enabled !== false);
+      renderClients(enabled);
+      updateCache('clients', list);
     }
   } catch (e) {
-    console.warn('Using default social links:', e);
+    // Retain cached view
   }
+}
 
-  const enabled = list.filter((s) => s.enabled !== false);
+// 12. Social Links
+function renderSocialLinks(list) {
+  if (!list) return;
   const heroSocial = document.getElementById('heroSocialLinks');
   const footerSocial = document.getElementById('footerSocialLinks');
 
-  const linksHtml = enabled
+  const linksHtml = list
     .map(
       (soc) => `
     <a href="${soc.url}" target="_blank" rel="noreferrer" class="social-icon-btn" title="${escapeHtml(soc.platform)}" aria-label="${escapeHtml(soc.platform)}">
@@ -670,22 +747,42 @@ async function loadSocialLinks() {
   if (footerSocial) footerSocial.innerHTML = linksHtml;
 }
 
-// 13. Settings & Footer
-async function loadSettings() {
-  let settings = DEFAULT_SETTINGS;
+async function loadSocialLinks() {
   try {
-    const snap = await getDoc(doc(db, 'settings', 'general'));
-    if (snap.exists()) {
-      settings = { ...DEFAULT_SETTINGS, ...snap.data() };
+    const q = query(collection(db, 'socialLinks'), orderBy('order', 'asc'));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const list = [];
+      snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
+      const enabled = list.filter((s) => s.enabled !== false);
+      renderSocialLinks(enabled);
+      updateCache('socialLinks', list);
     }
   } catch (e) {
-    console.warn('Using default settings:', e);
+    // Retain cached view
   }
+}
 
+// 13. Settings & Footer
+function renderSettings(settings) {
+  if (!settings) return;
   setText('siteBrandName', settings.siteName || 'Yeasin Arafat');
   setText('footerBrandName', settings.siteName || 'Yeasin Arafat');
   setText('footerDescText', settings.footerText || DEFAULT_SETTINGS.footerText);
   setText('footerCopyright', settings.copyright || DEFAULT_SETTINGS.copyright);
+}
+
+async function loadSettings() {
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'general'));
+    if (snap.exists()) {
+      const settings = { ...DEFAULT_SETTINGS, ...snap.data() };
+      renderSettings(settings);
+      updateCache('settings', settings);
+    }
+  } catch (e) {
+    // Retain cached view
+  }
 }
 
 // 14. Contact Form Submission (Saves directly to Cloud Firestore)
