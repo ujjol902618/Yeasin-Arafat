@@ -1,0 +1,287 @@
+{
+  "entities": {
+    "Profile": {
+      "title": "Profile",
+      "description": "Personal profile information of Yeasin Arafat",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "title": { "type": "string", "maxLength": 150 },
+        "photoUrl": { "type": "string", "maxLength": 2000 },
+        "shortBio": { "type": "string", "maxLength": 500 },
+        "fullBio": { "type": "string", "maxLength": 3000 },
+        "location": { "type": "string", "maxLength": 150 },
+        "email": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 50 },
+        "availability": { "type": "string", "maxLength": 100 },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["name", "title", "email"]
+    },
+    "About": {
+      "title": "About",
+      "description": "About section details and background",
+      "type": "object",
+      "properties": {
+        "content": { "type": "string", "maxLength": 5000 },
+        "subheading": { "type": "string", "maxLength": 300 },
+        "cvUrl": { "type": "string", "maxLength": 2000 },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["content"]
+    },
+    "Statistic": {
+      "title": "Statistic",
+      "description": "Key milestone or numeric statistic",
+      "type": "object",
+      "properties": {
+        "value": { "type": "string", "maxLength": 30 },
+        "label": { "type": "string", "maxLength": 100 },
+        "order": { "type": "number" }
+      },
+      "required": ["value", "label"]
+    },
+    "Skill": {
+      "title": "Skill",
+      "description": "Technical skill and proficiency",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "category": { "type": "string", "maxLength": 50 },
+        "level": { "type": "number" },
+        "enabled": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["name", "enabled"]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "Service offering",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 150 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "icon": { "type": "string", "maxLength": 50 },
+        "enabled": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "description", "enabled"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "Portfolio project item",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 5000 },
+        "thumbnail": { "type": "string", "maxLength": 2000 },
+        "images": { "type": "array" },
+        "technologies": { "type": "array" },
+        "category": { "type": "string", "maxLength": 100 },
+        "liveUrl": { "type": "string", "maxLength": 2000 },
+        "githubUrl": { "type": "string", "maxLength": 2000 },
+        "featured": { "type": "boolean" },
+        "published": { "type": "boolean" },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["title", "description", "published"]
+    },
+    "Experience": {
+      "title": "Experience",
+      "description": "Work and freelance experience item",
+      "type": "object",
+      "properties": {
+        "jobTitle": { "type": "string", "maxLength": 150 },
+        "company": { "type": "string", "maxLength": 150 },
+        "location": { "type": "string", "maxLength": 150 },
+        "startDate": { "type": "string", "maxLength": 50 },
+        "endDate": { "type": "string", "maxLength": 50 },
+        "description": { "type": "string", "maxLength": 3000 },
+        "companyLogo": { "type": "string", "maxLength": 2000 },
+        "order": { "type": "number" }
+      },
+      "required": ["jobTitle", "company"]
+    },
+    "Education": {
+      "title": "Education",
+      "description": "Educational background",
+      "type": "object",
+      "properties": {
+        "degree": { "type": "string", "maxLength": 150 },
+        "field": { "type": "string", "maxLength": 150 },
+        "institution": { "type": "string", "maxLength": 200 },
+        "startYear": { "type": "string", "maxLength": 50 },
+        "endYear": { "type": "string", "maxLength": 50 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "order": { "type": "number" }
+      },
+      "required": ["degree", "field", "institution"]
+    },
+    "Certification": {
+      "title": "Certification",
+      "description": "Professional certificate",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 200 },
+        "organization": { "type": "string", "maxLength": 200 },
+        "issueDate": { "type": "string", "maxLength": 50 },
+        "credentialId": { "type": "string", "maxLength": 150 },
+        "credentialUrl": { "type": "string", "maxLength": 2000 },
+        "imageUrl": { "type": "string", "maxLength": 2000 },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "organization"]
+    },
+    "Testimonial": {
+      "title": "Testimonial",
+      "description": "Client review or recommendation",
+      "type": "object",
+      "properties": {
+        "clientName": { "type": "string", "maxLength": 150 },
+        "company": { "type": "string", "maxLength": 150 },
+        "photoUrl": { "type": "string", "maxLength": 2000 },
+        "testimonial": { "type": "string", "maxLength": 3000 },
+        "rating": { "type": "number" },
+        "enabled": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["clientName", "testimonial", "enabled"]
+    },
+    "Client": {
+      "title": "Client",
+      "description": "Trusted client brand or logo",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 150 },
+        "logoUrl": { "type": "string", "maxLength": 2000 },
+        "websiteUrl": { "type": "string", "maxLength": 2000 },
+        "enabled": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["name", "enabled"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Public contact inquiry sent to portfolio owner",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 50 },
+        "subject": { "type": "string", "maxLength": 200 },
+        "message": { "type": "string", "maxLength": 5000 },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name", "email", "message"]
+    },
+    "MediaItem": {
+      "title": "MediaItem",
+      "description": "Media library asset metadata",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 255 },
+        "url": { "type": "string", "maxLength": 2000 },
+        "storagePath": { "type": "string", "maxLength": 500 },
+        "size": { "type": "number" },
+        "mimeType": { "type": "string", "maxLength": 100 },
+        "uploadedAt": { "type": "string" }
+      },
+      "required": ["name", "url"]
+    },
+    "SocialLink": {
+      "title": "SocialLink",
+      "description": "Social media profile link",
+      "type": "object",
+      "properties": {
+        "platform": { "type": "string", "maxLength": 50 },
+        "url": { "type": "string", "maxLength": 2000 },
+        "icon": { "type": "string", "maxLength": 50 },
+        "enabled": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["platform", "url", "enabled"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Website global configuration and metadata",
+      "type": "object",
+      "properties": {
+        "siteName": { "type": "string", "maxLength": 150 },
+        "logoUrl": { "type": "string", "maxLength": 2000 },
+        "faviconUrl": { "type": "string", "maxLength": 2000 },
+        "metaTitle": { "type": "string", "maxLength": 200 },
+        "metaDescription": { "type": "string", "maxLength": 500 },
+        "footerText": { "type": "string", "maxLength": 1000 },
+        "copyright": { "type": "string", "maxLength": 200 },
+        "contactEmail": { "type": "string", "maxLength": 100 },
+        "contactPhone": { "type": "string", "maxLength": 50 },
+        "address": { "type": "string", "maxLength": 200 }
+      },
+      "required": ["siteName"]
+    }
+  },
+  "firestore": {
+    "/profile/{docId}": {
+      "schema": "Profile",
+      "description": "Personal biography and contact metadata"
+    },
+    "/about/{docId}": {
+      "schema": "About",
+      "description": "About section narratives and resume links"
+    },
+    "/statistics/{statId}": {
+      "schema": "Statistic",
+      "description": "Key milestone numbers"
+    },
+    "/skills/{skillId}": {
+      "schema": "Skill",
+      "description": "Technical skillset inventory"
+    },
+    "/services/{serviceId}": {
+      "schema": "Service",
+      "description": "Client services provided"
+    },
+    "/projects/{projectId}": {
+      "schema": "Project",
+      "description": "Showcased portfolio projects"
+    },
+    "/experiences/{expId}": {
+      "schema": "Experience",
+      "description": "Career and work history"
+    },
+    "/education/{eduId}": {
+      "schema": "Education",
+      "description": "Academic qualifications"
+    },
+    "/certifications/{certId}": {
+      "schema": "Certification",
+      "description": "Earned certifications and badges"
+    },
+    "/testimonials/{testId}": {
+      "schema": "Testimonial",
+      "description": "Client recommendations"
+    },
+    "/clients/{clientId}": {
+      "schema": "Client",
+      "description": "Trusted client entities"
+    },
+    "/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Inbound contact messages from visitors"
+    },
+    "/media/{mediaId}": {
+      "schema": "MediaItem",
+      "description": "Media library assets list"
+    },
+    "/socialLinks/{linkId}": {
+      "schema": "SocialLink",
+      "description": "Social media links"
+    },
+    "/settings/{docId}": {
+      "schema": "Settings",
+      "description": "Global website settings"
+    }
+  }
+}

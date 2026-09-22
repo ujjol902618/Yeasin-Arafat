@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Yeasin Arafat | Web Developer & Web Designer</title>
+  <meta name="description" content="Personal portfolio and mobile-manageable CMS of Yeasin Arafat, Web Developer & Designer specializing in Laravel, PHP, modern UI/UX, and responsive web applications." />
+  
+  <!-- OpenGraph -->
+  <meta property="og:title" content="Yeasin Arafat | Web Developer & Web Designer" />
+  <meta property="og:description" content="Personal portfolio and mobile-manageable CMS of Yeasin Arafat, Web Developer & Designer specializing in Laravel, PHP, modern UI/UX, and responsive web applications." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/pwa-512x512.png" />
+
+  <!-- PWA & Mobile Meta Tags -->
+  <meta name="theme-color" content="#080c14" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="YeasinDev" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="/public/icon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <!-- Ambient background glow -->
+  <div class="bg-mesh"></div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Sticky Navbar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="#hero" class="brand-logo" id="brandLogoLink">
+        <div class="brand-icon-box">YA</div>
+        <span id="siteBrandName">Yeasin Arafat</span>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#skills" class="nav-link">Skills</a></li>
+          <li><a href="#services" class="nav-link">Services</a></li>
+          <li><a href="#projects" class="nav-link">Projects</a></li>
+          <li><a href="#experience" class="nav-link">Experience</a></li>
+          <li><a href="#testimonials" class="nav-link">Reviews</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Navbar Action Controls -->
+      <div class="nav-actions">
+        <!-- PWA In-App Install Button -->
+        <button id="pwaNavInstallBtn" class="btn btn-outline-cyan btn-sm" style="display: none;">
+          📲 Install App
+        </button>
+
+        <a href="#contact" class="btn btn-primary btn-sm">Let's Talk</a>
+
+        <a href="/admin.html" class="btn btn-secondary btn-sm" title="Admin CMS Portal">
+          🔒 Admin
+        </a>
+
+        <!-- Mobile Burger Button -->
+        <button class="burger-btn" id="burgerBtn" aria-label="Toggle navigation menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-nav" id="mobileNav">
+      <a href="#about" class="nav-link">About Me</a>
+      <a href="#skills" class="nav-link">Skills & Tools</a>
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#projects" class="nav-link">Portfolio Projects</a>
+      <a href="#experience" class="nav-link">Work Experience</a>
+      <a href="#testimonials" class="nav-link">Client Reviews</a>
+      <a href="#contact" class="nav-link">Contact</a>
+      <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+        <button id="pwaInstallBtn" class="btn btn-outline-cyan btn-sm" style="flex: 1; display: none;">
+          📲 Install PWA
+        </button>
+        <a href="/admin.html" class="btn btn-primary btn-sm" style="flex: 1;">
+          Admin CMS
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. HERO SECTION -->
+    <section id="hero" class="hero-section">
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <div class="hero-badge">
+              <span class="status-dot"></span>
+              <span id="heroAvailability">Available for Freelance & Full-time Roles</span>
+            </div>
+            <h1 class="hero-name">
+              Hello, I'm <span class="text-gradient" id="heroName">Yeasin Arafat</span>
+            </h1>
+            <h2 class="hero-title" id="heroTitle">Web Developer & Web Designer</h2>
+            <p class="hero-desc" id="heroDesc">
+              I build modern, responsive and user-focused websites and web applications that turn ideas into powerful digital experiences.
+            </p>
+
+            <div class="hero-actions">
+              <a href="#projects" class="btn btn-primary">View My Work</a>
+              <a href="#contact" class="btn btn-secondary">Get In Touch</a>
+              <a href="/admin.html" class="btn btn-outline-cyan" style="font-size: 0.88rem;">Manage from Phone</a>
+            </div>
+
+            <!-- Quick Social Bar -->
+            <div class="social-links-row" id="heroSocialLinks"></div>
+          </div>
+
+          <!-- Avatar / Profile Photo Frame -->
+          <div class="hero-image-wrapper">
+            <div class="hero-avatar-frame">
+              <img id="heroAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80" alt="Yeasin Arafat" class="hero-avatar-img" />
+              <div class="floating-tech-card">
+                <div style="font-size: 1.5rem;">⚡</div>
+                <div>
+                  <div style="font-size: 0.85rem; font-weight: 700; color: #fff;">Full-Stack Ready</div>
+                  <div style="font-size: 0.75rem; color: var(--accent-cyan);">Laravel & Modern Web</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. STATISTICS SECTION -->
+    <section id="statistics" style="padding-top: 0;">
+      <div class="container">
+        <div class="stats-grid" id="statisticsGrid">
+          <!-- Dynamically populated from Firestore -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ABOUT SECTION -->
+    <section id="about">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">About Me</div>
+          <h2 class="section-title">Turning Vision into <span class="text-gradient">Clean Code</span></h2>
+          <p class="section-desc" id="aboutSubheading">Crafting digital experiences with precision, logic, and modern design.</p>
+        </div>
+
+        <div class="about-grid">
+          <div class="glass-card">
+            <h3 style="font-size: 1.35rem; margin-bottom: 1.25rem; color: #fff;">My Professional Story</h3>
+            <div class="about-content" id="aboutContentText">
+              I am Yeasin Arafat, a Web Developer and Web Designer from Bangladesh. I completed my Diploma in Engineering in Computer Technology, where I developed a strong foundation in computer systems, programming, networking, database management and software development.
+
+              My main focus is web development, especially PHP and Laravel. I enjoy solving problems, learning modern technologies and building clean, responsive and user-friendly digital experiences.
+            </div>
+            <div style="margin-top: 2rem;">
+              <a href="#contact" id="aboutCvBtn" class="btn btn-primary">Download / View CV</a>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <div class="glass-card">
+              <h4 style="font-size: 1.1rem; color: var(--accent-cyan); margin-bottom: 0.5rem;">🎓 Technical Education</h4>
+              <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">
+                Diploma in Engineering in Computer Technology. Solid foundation in data structures, algorithms, relational database architecture, and software engineering principles.
+              </p>
+            </div>
+
+            <div class="glass-card">
+              <h4 style="font-size: 1.1rem; color: var(--accent-cyan); margin-bottom: 0.5rem;">📱 Mobile First & Responsive</h4>
+              <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">
+                Every interface is engineered to perform seamlessly across all screens—from mobile phones to high-resolution desktop displays, ensuring fast page load times and fluid user interactions.
+              </p>
+            </div>
+
+            <div class="glass-card">
+              <h4 style="font-size: 1.1rem; color: var(--accent-cyan); margin-bottom: 0.5rem;">🚀 Serverless & Cloud Powered</h4>
+              <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">
+                Integrated with Google Firebase Cloud Firestore, Authentication, and Cloud Storage for real-time synchronization and mobile CMS management.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. SKILLS SECTION -->
+    <section id="skills">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Expertise</div>
+          <h2 class="section-title">Technical <span class="text-gradient">Skills & Tools</span></h2>
+          <p class="section-desc">A breakdown of my programming languages, frameworks, and design proficiencies.</p>
+        </div>
+
+        <div class="skills-tabs">
+          <button class="tab-btn skills-tab-btn active" data-cat="all">All Skills</button>
+          <button class="tab-btn skills-tab-btn" data-cat="frontend">Frontend</button>
+          <button class="tab-btn skills-tab-btn" data-cat="backend">Backend</button>
+          <button class="tab-btn skills-tab-btn" data-cat="database">Database</button>
+          <button class="tab-btn skills-tab-btn" data-cat="cms">CMS</button>
+          <button class="tab-btn skills-tab-btn" data-cat="design">Design</button>
+          <button class="tab-btn skills-tab-btn" data-cat="tools">Tools</button>
+        </div>
+
+        <div class="skills-grid" id="skillsGrid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. SERVICES SECTION -->
+    <section id="services">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Services</div>
+          <h2 class="section-title">What I Can <span class="text-gradient">Do For You</span></h2>
+          <p class="section-desc">End-to-end web engineering, custom application architecture, and interface design.</p>
+        </div>
+
+        <div class="services-grid" id="servicesGrid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. PROJECTS SECTION -->
+    <section id="projects">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Portfolio</div>
+          <h2 class="section-title">Featured <span class="text-gradient">Projects</span></h2>
+          <p class="section-desc">Handcrafted web applications, dynamic platforms, and user-centric interfaces.</p>
+        </div>
+
+        <div class="projects-filter">
+          <button class="tab-btn project-filter-btn active" data-filter="all">All Work</button>
+          <button class="tab-btn project-filter-btn" data-filter="full stack">Full Stack</button>
+          <button class="tab-btn project-filter-btn" data-filter="web design">Web Design</button>
+          <button class="tab-btn project-filter-btn" data-filter="web application">Web Application</button>
+        </div>
+
+        <div class="projects-grid" id="projectsGrid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. EXPERIENCE SECTION -->
+    <section id="experience">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Career</div>
+          <h2 class="section-title">Work <span class="text-gradient">Experience</span></h2>
+          <p class="section-desc">My professional journey building production web software.</p>
+        </div>
+
+        <div class="timeline" id="experienceTimeline">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. EDUCATION SECTION -->
+    <section id="education">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Academics</div>
+          <h2 class="section-title">Education & <span class="text-gradient">Background</span></h2>
+          <p class="section-desc">Academic training in computer technology and software engineering.</p>
+        </div>
+
+        <div class="timeline" id="educationTimeline">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. CERTIFICATIONS SECTION -->
+    <section id="certifications">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Credentials</div>
+          <h2 class="section-title">Certifications & <span class="text-gradient">Honors</span></h2>
+          <p class="section-desc">Verified credentials and professional training certificates.</p>
+        </div>
+
+        <div class="certs-grid" id="certificationsGrid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. TESTIMONIALS SECTION -->
+    <section id="testimonials">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Feedback</div>
+          <h2 class="section-title">Client <span class="text-gradient">Testimonials</span></h2>
+          <p class="section-desc">What collaborators and business clients say about working together.</p>
+        </div>
+
+        <div class="testimonials-grid" id="testimonialsGrid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. CLIENTS SECTION -->
+    <section id="clients">
+      <div class="container">
+        <div class="section-header" style="margin-bottom: 2.5rem;">
+          <div class="section-tag">Collaborators</div>
+          <h2 class="section-title">Trusted By <span class="text-gradient">Teams & Brands</span></h2>
+        </div>
+
+        <div class="clients-grid" id="clientsGrid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. CONTACT SECTION -->
+    <section id="contact">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Get In Touch</div>
+          <h2 class="section-title">Let's Discuss <span class="text-gradient">Your Project</span></h2>
+          <p class="section-desc">Have an idea or need a website built? Send a direct message below.</p>
+        </div>
+
+        <div class="contact-grid">
+          <!-- Contact Info Column -->
+          <div class="glass-card">
+            <h3 style="font-size: 1.35rem; margin-bottom: 0.75rem;">Contact Information</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">
+              I am currently open to new web development opportunities, freelancing contracts, and full-time positions. Reach out anytime!
+            </p>
+
+            <div class="contact-info-list">
+              <div class="contact-item">
+                <div class="contact-icon-box">📧</div>
+                <div>
+                  <div class="contact-label">Email</div>
+                  <a href="mailto:arafatujjol567@gmail.com" class="contact-val" id="contactEmailVal">arafatujjol567@gmail.com</a>
+                </div>
+              </div>
+
+              <div class="contact-item">
+                <div class="contact-icon-box">📱</div>
+                <div>
+                  <div class="contact-label">Phone / WhatsApp</div>
+                  <a href="tel:+8801700000000" class="contact-val" id="contactPhoneVal">+880 1700-000000</a>
+                </div>
+              </div>
+
+              <div class="contact-item">
+                <div class="contact-icon-box">📍</div>
+                <div>
+                  <div class="contact-label">Location</div>
+                  <div class="contact-val" id="contactLocationVal">Dhaka, Bangladesh</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Form (Firestore Direct) -->
+          <div class="glass-card">
+            <h3 style="font-size: 1.35rem; margin-bottom: 1.25rem;">Send a Message</h3>
+            <form id="contactForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="contactName">Your Name *</label>
+                  <input type="text" id="contactName" class="form-control" placeholder="John Doe" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="contactEmail">Your Email *</label>
+                  <input type="email" id="contactEmail" class="form-control" placeholder="john@example.com" required />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="contactPhone">Phone / WhatsApp</label>
+                  <input type="text" id="contactPhone" class="form-control" placeholder="+1 234 567 890" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="contactSubject">Subject</label>
+                  <input type="text" id="contactSubject" class="form-control" placeholder="Project Inquiry / Hiring" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="contactMessage">Message *</label>
+                <textarea id="contactMessage" class="form-control" placeholder="Tell me about your project, timeline, and requirements..." required></textarea>
+              </div>
+
+              <button type="submit" id="contactSubmitBtn" class="btn btn-primary" style="width: 100%;">
+                Send Message
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div>
+          <a href="#hero" class="brand-logo" style="margin-bottom: 0.5rem;">
+            <div class="brand-icon-box">YA</div>
+            <span id="footerBrandName">Yeasin Arafat</span>
+          </a>
+          <p id="footerDescText" style="color: var(--text-muted); font-size: 0.9rem; max-width: 420px; line-height: 1.6;">
+            Building modern, responsive, and user-focused web solutions that turn creative ideas into powerful digital experiences.
+          </p>
+        </div>
+
+        <div class="social-links-row" id="footerSocialLinks">
+          <!-- Dynamic Social Media Icons -->
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p id="footerCopyright">© 2026 Yeasin Arafat. All rights reserved.</p>
+        <div style="display: flex; gap: 1.5rem; align-items: center;">
+          <a href="#hero" style="color: var(--text-muted); text-decoration: none; font-size: 0.85rem;">Back to Top ↑</a>
+          <a href="/admin.html" style="color: var(--accent-cyan); text-decoration: none; font-size: 0.85rem; font-weight: 600;">🔒 Admin CMS Portal</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Project Gallery Modal -->
+  <div id="projectModal" class="modal-overlay" onclick="if(event.target===this) window.closeProjectModal()">
+    <div class="modal-content">
+      <button class="modal-close-btn" onclick="window.closeProjectModal()">✕</button>
+      <div id="projectModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Entry Script -->
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

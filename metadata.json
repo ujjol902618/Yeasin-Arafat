@@ -1,0 +1,6 @@
+{
+  "name": "Yeasin Arafat - Portfolio & CMS",
+  "description": "Dynamic personal portfolio and mobile admin CMS for Yeasin Arafat, Web Developer & Designer, with Firebase authentication, Firestore, and Storage.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Admin Panel | Yeasin Arafat CMS</title>
+  
+  <meta name="theme-color" content="#070a12" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="YeasinCMS" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="/public/icon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+  <!-- Toast Notification Container -->
+  <div id="adminToastContainer" class="toast-container"></div>
+
+  <!-- Sidebar Overlay for Mobile -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <div class="admin-layout">
+    <!-- Left Sidebar / Mobile Drawer -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="sidebar-header">
+        <a href="/admin.html" class="sidebar-brand">
+          <div class="brand-icon-box" style="width: 32px; height: 32px; font-size: 0.95rem;">YA</div>
+          <span>Yeasin CMS</span>
+        </a>
+        <span class="sidebar-brand-badge">Phone App</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-category-title">Main</div>
+        <a href="#dashboard" class="sidebar-item active" data-view="dashboard">
+          <span>📊</span> Dashboard
+        </a>
+
+        <div class="nav-category-title">Identity & Story</div>
+        <a href="#profile" class="sidebar-item" data-view="profile">
+          <span>👤</span> Profile & Avatar
+        </a>
+        <a href="#about" class="sidebar-item" data-view="about">
+          <span>📄</span> About Me
+        </a>
+        <a href="#statistics" class="sidebar-item" data-view="statistics">
+          <span>📈</span> Statistics
+        </a>
+        <a href="#skills" class="sidebar-item" data-view="skills">
+          <span>⚡</span> Skills & Tools
+        </a>
+        <a href="#services" class="sidebar-item" data-view="services">
+          <span>🛠️</span> Services
+        </a>
+
+        <div class="nav-category-title">Showcase</div>
+        <a href="#projects" class="sidebar-item" data-view="projects">
+          <span>📁</span> Projects Portfolio
+        </a>
+        <a href="#experience" class="sidebar-item" data-view="experience">
+          <span>💼</span> Work Experience
+        </a>
+        <a href="#education" class="sidebar-item" data-view="education">
+          <span>🎓</span> Education
+        </a>
+        <a href="#certifications" class="sidebar-item" data-view="certifications">
+          <span>🏅</span> Certifications
+        </a>
+        <a href="#testimonials" class="sidebar-item" data-view="testimonials">
+          <span>💬</span> Testimonials
+        </a>
+        <a href="#clients" class="sidebar-item" data-view="clients">
+          <span>🤝</span> Trusted Clients
+        </a>
+
+        <div class="nav-category-title">Inquiries & Storage</div>
+        <a href="#messages" class="sidebar-item" data-view="messages">
+          <span>✉️</span> Messages
+          <span class="sidebar-item-badge" id="unreadMessagesBadge" style="display: none;">0</span>
+        </a>
+        <a href="#media" class="sidebar-item" data-view="media">
+          <span>🖼️</span> Media Library
+        </a>
+
+        <div class="nav-category-title">Configuration</div>
+        <a href="#socialLinks" class="sidebar-item" data-view="socialLinks">
+          <span>🌐</span> Social Links
+        </a>
+        <a href="#settings" class="sidebar-item" data-view="settings">
+          <span>⚙️</span> Website Settings
+        </a>
+        <a href="#setupGuide" class="sidebar-item" data-view="setupGuide">
+          <span>📖</span> Firebase & PWA Guide
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="seedPortfolioBtn" class="btn-admin btn-dark btn-sm" style="width: 100%; justify-content: flex-start;">
+          🔄 Restore Seed Data
+        </button>
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; color: #94a3b8; padding: 0.25rem 0;">
+          <span id="adminUserEmail" style="overflow: hidden; text-overflow: ellipsis; max-width: 150px;">Admin</span>
+          <button id="adminLogoutBtn" style="background: none; border: none; color: #ef4444; font-weight: 600; cursor: pointer;">Sign Out</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="admin-main">
+      <!-- Top App Bar -->
+      <header class="admin-header">
+        <div class="header-left">
+          <button class="menu-toggle-btn" id="menuToggleBtn" aria-label="Toggle navigation drawer">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <h1 class="header-title" id="headerViewTitle">Admin Dashboard</h1>
+        </div>
+
+        <div class="header-actions">
+          <a href="/" target="_blank" class="btn-admin btn-dark btn-sm" title="View Public Site">
+            ↗ Live Portfolio
+          </a>
+        </div>
+      </header>
+
+      <!-- Dynamic View Container -->
+      <main class="admin-content" id="adminViewContainer">
+        <!-- Injected by js/admin.js -->
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation (Phone App View) -->
+  <nav class="mobile-bottom-nav">
+    <button class="bottom-nav-btn active" data-view="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect width="7" height="9" x="3" y="3" rx="1"/>
+        <rect width="7" height="5" x="14" y="3" rx="1"/>
+        <rect width="7" height="9" x="14" y="12" rx="1"/>
+        <rect width="7" height="5" x="3" y="16" rx="1"/>
+      </svg>
+      <span>Dashboard</span>
+    </button>
+
+    <button class="bottom-nav-btn" data-view="projects">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
+      </svg>
+      <span>Projects</span>
+    </button>
+
+    <button class="bottom-nav-btn" data-view="messages">
+      <div id="bottomUnreadDot" class="badge-dot" style="display: none;"></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect width="20" height="16" x="2" y="4" rx="2"/>
+        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+      </svg>
+      <span>Messages</span>
+    </button>
+
+    <button class="bottom-nav-btn" data-view="media">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+        <circle cx="9" cy="9" r="2"/>
+        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+      </svg>
+      <span>Media</span>
+    </button>
+
+    <button class="bottom-nav-btn" id="moreMobileMenuBtn" onclick="document.getElementById('menuToggleBtn').click()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="1"/>
+        <circle cx="12" cy="5" r="1"/>
+        <circle cx="12" cy="19" r="1"/>
+      </svg>
+      <span>More</span>
+    </button>
+  </nav>
+
+  <!-- Mobile Floating Action Button (Quick Add) -->
+  <button class="mobile-fab" onclick="window.switchView('projects')" title="Add New Project">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
+  </button>
+
+  <script type="module" src="/js/admin.js"></script>
+</body>
+</html>
