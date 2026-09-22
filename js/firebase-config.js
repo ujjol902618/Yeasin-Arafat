@@ -45,14 +45,17 @@ export function handleFirestoreError(error, operationType, path) {
   return errInfo;
 }
 
-// Test connection helper (optional, non-blocking)
+// Validate Connection to Firestore (Per Firebase integration skill)
 export async function testConnection() {
   try {
-    const snap = await doc(db, 'settings', 'general');
-    if (snap) {
-      console.info('Firestore initialized successfully.');
-    }
+    await getDocFromServer(doc(db, 'settings', 'general'));
+    console.info('Cloud Firestore connection established.');
   } catch (error) {
-    console.warn('Firestore initialization notice:', error?.message);
+    if (error instanceof Error && (error.message.includes('the client is offline') || error.message.includes('unavailable') || error.code === 'unavailable')) {
+      console.warn('Firestore is running in offline/cached mode. Client will sync when network is restored.');
+    } else {
+      console.warn('Firestore connection check notice:', error?.message);
+    }
   }
 }
+testConnection();

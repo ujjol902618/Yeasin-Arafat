@@ -9,7 +9,7 @@ import {
   orderBy,
 } from 'firebase/firestore';
 import { db } from './firebase-config.js';
-import { checkAdminAccess, logoutUser } from './firebase-auth.js';
+import { checkAdminAccess, logoutUser, getStoredPasscode, setStoredPasscode } from './firebase-auth.js';
 import {
   DEFAULT_PROFILE,
   DEFAULT_ABOUT,
@@ -2154,10 +2154,28 @@ async function renderSettingsEditor(container) {
         <label class="form-label">Copyright Notice</label>
         <input type="text" id="setCopyright" class="form-control" value="${escapeHtml(settings.copyright || '')}" />
       </div>
+
+      <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <h4 style="color: #00f0ff; font-size: 0.95rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+          🔑 Master Admin Passcode
+        </h4>
+        <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.75rem; line-height: 1.45;">
+          Allows instant access from any phone or custom domain without Firebase OAuth or Google Cloud allowlisting setup.
+        </p>
+        <div class="form-group">
+          <label class="form-label">Passcode</label>
+          <input type="text" id="setAdminPasscode" class="form-control" value="${escapeHtml(settings.adminPasscode || getStoredPasscode())}" />
+        </div>
+      </div>
     </div>
   `;
 
   document.getElementById('saveSettingsBtn')?.addEventListener('click', async () => {
+    const passcodeVal = document.getElementById('setAdminPasscode')?.value.trim();
+    if (passcodeVal) {
+      setStoredPasscode(passcodeVal);
+    }
+
     const payload = {
       siteName: document.getElementById('setSiteName').value.trim(),
       contactPhone: document.getElementById('setPhone').value.trim(),
@@ -2167,12 +2185,13 @@ async function renderSettingsEditor(container) {
       metaDescription: document.getElementById('setMetaDesc').value.trim(),
       footerText: document.getElementById('setFooterText').value.trim(),
       copyright: document.getElementById('setCopyright').value.trim(),
+      adminPasscode: passcodeVal || getStoredPasscode(),
       updatedAt: new Date().toISOString(),
     };
 
     try {
       await setDoc(doc(db, 'settings', 'general'), payload, { merge: true });
-      showAdminToast('Website settings saved!', 'success');
+      showAdminToast('Website settings & passcode saved!', 'success');
     } catch (err) {
       showAdminToast('Failed to save settings: ' + err.message, 'error');
     }

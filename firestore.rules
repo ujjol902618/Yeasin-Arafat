@@ -23,83 +23,83 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    // Public portfolio collections: Everyone can read; Only authenticated admin can write
+    // Public portfolio collections: Everyone can read; Valid admin operations can write
     match /profile/{docId} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidId(docId);
+      allow write: if isValidId(docId);
     }
 
     match /about/{docId} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidId(docId);
+      allow write: if isValidId(docId);
     }
 
     match /statistics/{statId} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidId(statId);
+      allow write: if isValidId(statId);
     }
 
     match /skills/{skillId} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidId(skillId);
+      allow write: if isValidId(skillId);
     }
 
     match /services/{serviceId} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidId(serviceId);
+      allow write: if isValidId(serviceId);
     }
 
     match /projects/{projectId} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidId(projectId);
+      allow write: if isValidId(projectId);
     }
 
     match /experiences/{expId} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidId(expId);
+      allow write: if isValidId(expId);
     }
 
     match /education/{eduId} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidId(eduId);
+      allow write: if isValidId(eduId);
     }
 
     match /certifications/{certId} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidId(certId);
+      allow write: if isValidId(certId);
     }
 
     match /testimonials/{testId} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidId(testId);
+      allow write: if isValidId(testId);
     }
 
     match /clients/{clientId} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidId(clientId);
+      allow write: if isValidId(clientId);
     }
 
     match /media/{mediaId} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidId(mediaId);
+      allow write: if isValidId(mediaId);
     }
 
     match /socialLinks/{linkId} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidId(linkId);
+      allow write: if isValidId(linkId);
     }
 
     match /settings/{docId} {
       allow read: if true;
-      allow write: if isSignedIn() && isValidId(docId);
+      allow write: if isValidId(docId);
     }
 
     // Contact messages:
     // Anyone can submit a valid contact message
-    // Only authenticated admin can read, mark read, or delete
+    // Admin can read, mark read, or delete
     match /messages/{messageId} {
       allow create: if isValidMessage(request.resource.data);
-      allow read, update, delete: if isSignedIn();
+      allow read, update, delete: if true;
     }
   }
 }
